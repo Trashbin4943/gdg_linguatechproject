@@ -24,3 +24,17 @@ savReaderWriter==3.4.2
 six==1.17.0
 sqlparse==0.5.3
 tzdata==2025.2
+librosa
+numpy
+scipy
+soundfile
+transformers
+torch
+sentencepiece
+tensorflow
+scikit-learn
+pandas
+matplotlib
+seaborn
+openai-whisper
+ffmpeg-python
