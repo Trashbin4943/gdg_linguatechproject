@@ -38,3 +38,6 @@ matplotlib
 seaborn
 openai-whisper
 ffmpeg-python
+enum
+typing
+dataclasses
