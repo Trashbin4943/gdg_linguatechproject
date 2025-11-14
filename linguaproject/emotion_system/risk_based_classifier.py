@@ -191,7 +191,7 @@ class RiskScoreClassifier:
         risk_score = 0
         issues = []
         
-        # 상담 내용
+        # 상담 내용 분석
         content = metadata.consultation_content
         if content == '고충 상담':
             risk_score += 3
@@ -199,7 +199,7 @@ class RiskScoreClassifier:
         elif content == '업무 처리':
             risk_score += 1
         
-        # 상담 결과
+        # 상담 결과 분석
         result = metadata.consultation_result
         if result == '해결 불가':
             risk_score += 3
