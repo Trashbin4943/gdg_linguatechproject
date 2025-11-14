@@ -9,9 +9,6 @@ Risk Score 기반 분류 시스템
 from enum import Enum
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
-import torch
-from transformers import BertTokenizer, BertForSequenceClassification
-import numpy as np
 
 from classification_criteria import (
     ClassificationCriteria,
@@ -61,23 +58,22 @@ class ProfanityFilter:
         """
         Args:
             use_korcen: korcen.py 기반 필터 사용 여부 (기본: True)
-            model_name: 사전 학습된 모델 (욕설 분류용으로 Fine-tuning 필요)
+            model_name: 사전 학습된 모델 (욕설 분류용으로 Fine-tuning 필요, 현재 미사용)
         """
-        self.use_korcen = use_korcen
+        self.use_korcen = False
+        self.use_baseline = True  # 기본값: Baseline 규칙 사용
         
         if use_korcen:
             # 통화 상담 특화 필터 사용
             try:
                 from call_center_profanity_filter import CallCenterProfanityFilter
                 self.korcen_filter = CallCenterProfanityFilter()
+                self.use_korcen = True
+                self.use_baseline = False
             except ImportError:
                 print("Warning: call_center_profanity_filter를 로드할 수 없습니다. Baseline 규칙을 사용합니다.")
                 self.use_korcen = False
-        
-        if not self.use_korcen:
-            # Baseline 규칙 사용
-            self.tokenizer = BertTokenizer.from_pretrained(model_name) if model_name else None
-            self.use_baseline = True
+                self.use_baseline = True
     
     def detect_profanity(self, text: str) -> Tuple[bool, Optional[str], float]:
         """
@@ -88,15 +84,40 @@ class ProfanityFilter:
         """
         if self.use_korcen and hasattr(self, 'korcen_filter'):
             # korcen.py 기반 통화 상담 특화 필터 사용
-            is_prof, level, pattern, confidence = self.korcen_filter.check_profanity(text)
-            
-            if is_prof and level:
-                category = self.korcen_filter.get_profanity_category(level)
-                return True, category, confidence
-            
-            return False, None, 0.0
+            try:
+                # check_profanity의 반환값 형식에 따라 처리
+                profanity_result = self.korcen_filter.check_profanity(text)
+                
+                # 반환값이 튜플인 경우 처리
+                if isinstance(profanity_result, tuple):
+                    if len(profanity_result) >= 3:
+                        is_prof, level, pattern = profanity_result[:3]
+                        confidence = profanity_result[3] if len(profanity_result) > 3 else 0.8
+                    else:
+                        is_prof, level = profanity_result[:2]
+                        pattern = None
+                        confidence = 0.8
+                else:
+                    # 단일 값 반환인 경우
+                    is_prof = bool(profanity_result)
+                    level = None
+                    pattern = None
+                    confidence = 0.8
+                
+                if is_prof and level:
+                    if hasattr(self.korcen_filter, 'get_profanity_category'):
+                        category = self.korcen_filter.get_profanity_category(level)
+                    else:
+                        category = str(level)
+                    return True, category, confidence
+                
+                return False, None, 0.0
+            except Exception as e:
+                print(f"Warning: korcen 필터 실행 중 오류 발생: {e}. Baseline 규칙으로 전환합니다.")
+                self.use_korcen = False
+                self.use_baseline = True
         
-        elif self.use_baseline:
+        if self.use_baseline:
             # Baseline 규칙으로 욕설 감지
             results = ClassificationCriteria.classify_text(text)
             
@@ -112,10 +133,9 @@ class ProfanityFilter:
                     return True, result.category.value, result.confidence
             
             return False, None, 0.0
-        else:
-            # KoBERT 기반 욕설 분류 모델 사용
-            # TODO: Fine-tuning된 모델 로드 및 예측
-            pass
+        
+        # 기본값: 욕설 없음
+        return False, None, 0.0
     
     def filter_profanity(self, text: str) -> Optional[RiskScoreResult]:
         """
