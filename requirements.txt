@@ -55,3 +55,14 @@ wordcloud==1.9.4
 xarray==2025.9.0
 xarray-einstats==0.9.1
 xlrd==2.0.2
+torch>=2.0.0
+transformers>=4.30.0
+faster-whisper>=0.10.0
+pyannote.audio>=2.1.1
+huggingface-hub>=0.20.0
+sentencepiece>=0.1.99
+librosa>=0.10.0
+numpy>=1.24.0
+scipy>=1.11.0
+pydub>=0.25.1
+sounddevice>=0.4.6
