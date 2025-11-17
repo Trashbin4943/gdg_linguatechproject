@@ -9,12 +9,11 @@ import wave
 from faster_whisper import WhisperModel
 from pyannote.audio import Pipeline
 
-from emotion.text_emotion import classify_text_emotion
-from emotion.audio_emotion import classify_audio_emotion
-from features.extract_features import extract_features
-from response.generate_response import generate_response
-from risk_score import RiskScoreClassifier, ConsultationMetadata
-
+from ..emotion.text_emotion import classify_text_emotion
+from ..emotion.audio_emotion import classify_audio_emotion
+from ..features.extract_features import extract_features
+from ..response.generate_response import generate_response
+from logic_classify_system.risk_based_classifier import RiskScoreClassifier, ConsultationMetadata
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 # 오디오 큐

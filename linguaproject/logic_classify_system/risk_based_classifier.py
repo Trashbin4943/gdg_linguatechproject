@@ -333,7 +333,7 @@ if __name__ == "__main__":
     classifier = RiskScoreClassifier()
     
     # 예제 1: 욕설 감지
-    text1 = "X팔 너 거기서 뭐 배웠냐?"
+    text1 = "너 같은 새끼는 진작에 죽었어야 해!"
     result1 = classifier.classify(text1)
     print("=" * 80)
     print("예제 1: 욕설 감지")
@@ -346,7 +346,7 @@ if __name__ == "__main__":
     print(f"권장 조치: {result1.recommendation}")
     
     # 예제 2: 메타데이터 기반 위험도
-    text2 = "이전에도 말씀드렸다시피 같은 문제인데요."
+    text2 = "그렇군요"
     metadata2 = ConsultationMetadata(
         consultation_content='고충 상담',
         consultation_result='해결 불가',
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     print(f"권장 조치: {result2.recommendation}")
     
     # 예제 3: 정상 케이스
-    text3 = "안녕하세요, 문의사항이 있어서 전화드렸습니다."
+    text3 = "아니 뭐 언제까지 기다리라고요."
     metadata3 = ConsultationMetadata(
         consultation_content='일반 문의',
         consultation_result='만족',
