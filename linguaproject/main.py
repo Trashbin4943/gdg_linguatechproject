@@ -6,7 +6,7 @@ from emotion_system.features.extract_features import extract_features
 from emotion_system.response.generate_response import generate_response
 from emotion_system.response.compare_actions import compare_actions
 from emotion_system.utils.audio_utils import convert_to_wav
-from emotion_system.streaming_input import (
+from linguaproject.linguaproject.emotion_system.utils.streaming_input import (
     run_live_emotion_only,
     run_live_emotion_with_diarization,
     run_live_pipeline
